@@ -1,0 +1,59 @@
+server:
+  port: 80
+spring:
+  application:
+    name: spring-cloud-gateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+      - id: spring-cloud
+        uri: http://www.ityouknow.com
+        predicates:
+        - Path=/spring-cloud
+        filters:
+        #请求路径截取的功能@截取一位
+        - StripPrefix=0
+      - id: baidu
+        uri: https://www.baidu.com
+        predicates:
+        - Path=/baidu
+        filters:
+        #请求路径截取的功能@value截取几位
+        - StripPrefix=1
+      - id: spring-producer
+        uri: lb://spring-cloud-producer
+        predicates:
+        - Path=/spring-producer/**
+        filters:
+        #请求路径截取的功能@截取一位
+        - StripPrefix=1
+
+
+logging:
+  level:
+    #调整相 gateway 包的 log 级别，以便排查问题
+    org.springframework.cloud.gateway: debug
+
+eureka:
+  client:
+#    fetch-registry: false
+#    register-with-eureka: false
+    service-url:
+       defaultZone: http://Arnold:123456@localhost:8761/eureka/,http://Arnold:123456@localhost:8762/eureka/
+  instance:
+     hostname: localhost
+     #就可以将IP注册到Eureka Server上，而如果不配置就是机器的主机名
+     prefer-ip-address: true
+     instance-id: ${spring.cloud.client.ip-address}:${spring.application.name}:${spring.application.instance_id:${server.port}}
+
+
+
+
+
+
+
+
